@@ -1,0 +1,54 @@
+<style>
+  .container {
+    width: 950px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 10%;
+  }
+
+  .repo_button {
+    width: 200px;
+    background-color: #e1d8d8;
+    height: 50px;
+    border: 3px solid #dbdbdb;
+    margin: 0 auto;
+    border-radius: 10px;
+    font-size: 30px;
+  }
+
+  .repo_button:hover {
+    background-color: #ccc7c7;
+  }
+
+  a {
+    text-decoration: none;
+
+  }
+
+</style>
+
+<div class="container">
+
+  <div class="">
+    <% if (user) { %>
+      <h1>User: <%= user.username %> </h1>
+      <% } %>
+        <a class="" href="/issues">
+
+          <div class="repo_button">
+            Repos
+          </div>
+        </a>
+  </div>
+
+  <% if (repos) { %>
+    <ul>
+      <% repos.forEach((repo) => {%>
+
+        <li>
+          <%= repo.name %>
+        </li>
+        <% });%>
+    </ul>
+    <% } %>
+</div>
