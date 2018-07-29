@@ -9,7 +9,7 @@ const express = require('express'),
 	GithubApi = require('github-api'),
 	issues = require("./config/data.json");
 
-mongoose.connect('mongodb://localhost/gitlister_db');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/gitlister_db');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
