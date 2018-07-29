@@ -124,7 +124,7 @@ app.get('/auth/github/callback',
 
 // app.get('/login', passport.authenticate('local'))
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 3000, () => {
 	console.log('listening');
 })
 
