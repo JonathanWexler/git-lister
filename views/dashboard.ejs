@@ -1,3 +1,13 @@
+<script type="text/javascript">
+  ( function () {
+    let star = document.getElementsByClassName( 'repo_star' );
+    star.on( 'click', ( e ) => {
+      alert( 'clicked' );
+    } );
+
+  } )();
+
+</script>
 <style>
   .container {
     width: 100%;
@@ -51,11 +61,12 @@
     width: 30px;
     display: inline-block;
     height: 30px;
-    background-color: gray;
+    background-color: #ebebeb;
     border: 3px solid white;
     border-radius: 20px;
     margin: 10px;
     float: right;
+    overflow: hidden;
   }
 
   .progress {
@@ -122,6 +133,23 @@
     }
   }
 
+  .star {
+    /* width: 25px;
+    padding: 3px;
+    padding-bottom: 5px;
+    z-index: 100; */
+    fill: white;
+  }
+
+  .star:hover {
+    fill: gold;
+  }
+
+  .favorite_link svg {
+    /* margin: 5; */
+    margin-bottom: -10;
+  }
+
 </style>
 
 <div class="container dashboard">
@@ -132,12 +160,22 @@
 
   <div class="project">
     <% data.forEach((card) => { %>
-      <a href="/repo/<%= card.title %>/<%= card.author%>">
+      <a href="/repo/<%= card.author %>/<%= card.title %>/">
         <div class="issue">
-          <span class="issue_status <%= card.status %>"></span>
+          <span class="issue_status <%= card.status %>">
+					</span>
 
           <div class="issue_title">
             <%= card.title %>
+              <% if (card.isRepo) { %>
+                <a href="/repos/<%= card._id %>/favorite" class="favorite_link">
+								<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+								<g transform="scale(.2)">
+									<path class="star" d="m55,237 74-228 74,228L9,96h240"/>
+									</g>
+								</svg>
+							</a>
+                <% } %>
           </div>
           <div class="issue_description">
             <%= card.description %>
@@ -153,7 +191,7 @@
             </div>
 
             <div class="issue_date">
-              <%= card.last_updated %>
+              <%= card.lastUpdated %>
             </div>
           </div>
 

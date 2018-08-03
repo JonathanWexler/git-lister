@@ -1,6 +1,17 @@
 const mongoose = require('mongoose');
 
-var UserSchema = new mongoose.Schema({
+const RepoSchema = new mongoose.Schema({
+  title: String,
+	githubId: String,
+  description: String,
+  author: String,
+  issuesCount: Number,
+  lastUpdated: Date,
+}, {timestamps: true});
+
+const Repo = mongoose.model('Repo', RepoSchema);
+
+const UserSchema = new mongoose.Schema({
   username: String,
 	githubId: String,
 	githubToken: String,
@@ -8,11 +19,14 @@ var UserSchema = new mongoose.Schema({
   bio: String,
   image: String,
   hash: String,
-  salt: String
+  salt: String,
+	repos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Repo' }]
 }, {timestamps: true});
 
+const User = mongoose.model('User', UserSchema);
 
 module.exports = {
 
-		User: mongoose.model('User', UserSchema)
+		User: User,
+		Repo: Repo,
 }
