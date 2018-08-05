@@ -36,13 +36,11 @@ module.exports = {
 	},
 
 	profile: (req, res) => {
-		if (req.isAuthenticated()) {
-			console.log(req.repos);
-
-			res.render('profile', {user: req.user, repos: req.repos});
-
-		} else {
-			res.redirect('/');
-		}
+		// if (req.isAuthenticated()) {
+		User.findOne({_id: req.user._id})
+				.populate('favorites')
+				.then( (user) => {
+					res.render('profile', { user: user, repos: req.repos });
+				});
 	}
 };

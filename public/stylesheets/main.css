@@ -106,7 +106,7 @@
 }
 
 .issue_date {
-  padding: 20px;
+  padding: 16px;
   padding-top: 0;
   color: #545353;
   display: inline-block;
@@ -123,11 +123,11 @@
 }
 
 .star {
-  /* width: 25px;
-padding: 3px;
-padding-bottom: 5px;
-z-index: 100; */
   fill: white;
+}
+
+.star.gold {
+  fill: gold;
 }
 
 .star:hover {
@@ -169,6 +169,7 @@ z-index: 100; */
   background-color: #efefef;
   padding: 10px;
   margin-bottom: 50px;
+  overflow: hidden;
 }
 
 .item {
@@ -177,6 +178,7 @@ z-index: 100; */
   background-color: #4ce74c82;
   border-radius: 10px;
   margin: 10px;
+  float: left;
 }
 
 .item:hover {

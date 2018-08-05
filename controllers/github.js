@@ -3,7 +3,7 @@ const GithubApi = require('github-api'),
 
 let getGithubAccount = (user) => {
 	return gh = new GithubApi({
-		username: 'JonathanWexler',
+		username: user.username,
 		token: user.githubToken
 	});
 },
@@ -49,14 +49,12 @@ updateRepoData = (repos) => {
 
 },
 filterIssueData = (data) => {
-	console.log(data);
 	return data;
 };
 
 module.exports = {
 
 	updateUserFavorites: (res, req, err, next) => {
-		console.log("At user spot");
 
 		User.findOneAndUpdate({
 			_id: req.user.id
@@ -67,7 +65,6 @@ module.exports = {
 		}, {
 			new:true
 		}).then(() => {
-			console.log("updated " )
 			res.redirect('/')
 		});
 	},
@@ -126,10 +123,14 @@ module.exports = {
 										 .then(() => {
 											 User.findOne({_id: user._id})
 											 		 .populate('repos')
-													 .then((theUser) => {
-														 console.log(theUser.repos)
-
-														 res.render('dashboard', {title: 'Repos', data: theUser.repos});
+													 .then((user) => {
+														 user.repos.forEach((repo) => {
+															 let fav = user.favorites.some((fav) => { return fav.equals(repo._id)}) ;
+															 if (fav) {
+															 	repo.isFav = true;
+															 }
+														 })
+														 res.render('dashboard', {title: 'Repos', user: user, data: user.repos });
 											 	 	 });
 										 });
 

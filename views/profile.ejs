@@ -1,72 +1,14 @@
-<style>
-  .container {
-    width: 950px;
-    margin: 0 auto;
-    text-align: center;
-    margin-top: 10%;
-  }
-
-  .repo_button {
-    width: 200px;
-    background-color: #e1d8d8;
-    height: 50px;
-    border: 3px solid #dbdbdb;
-    margin: 0 auto;
-    border-radius: 10px;
-    font-size: 30px;
-  }
-
-  .repo_button:hover {
-    background-color: #ccc7c7;
-  }
-
-  .favorites {
-    width: 950px;
-    min-height: 100px;
-    border-radius: 10px;
-    background-color: #efefef;
-    padding: 10px;
-    margin-bottom: 50px;
-  }
-
-  .item {
-    width: 150px;
-    height: 100px;
-    background-color: #4ce74c82;
-    border-radius: 10px;
-    margin: 10px;
-  }
-
-  .item:hover {
-    width: 170px;
-    height: 120px;
-    margin: 0;
-    cursor: pointer;
-  }
-
-  .star {
-    width: 20px;
-    float: right;
-    margin: 10px;
-    background-color: gold;
-    border-radius: 10px;
-  }
-
-  a {
-    text-decoration: none;
-
-  }
-
-</style>
-
 <div class="container">
   <div class="">
     <% if (user) { %>
       <h1>User: <%= user.username %> </h1>
       <div class="favorites">
-        <div class="item">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Five-pointed_star.svg/2000px-Five-pointed_star.svg.png" class="star" alt="">
-        </div>
+        <% user.favorites.forEach((favorite) => {%>
+          <div class="item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Five-pointed_star.svg/2000px-Five-pointed_star.svg.png" class="star" alt="">
+            <h2> <%= favorite.title%></h2>
+          </div>
+          <% }); %>
       </div>
       <% } %>
         <a class="" href="/repos">

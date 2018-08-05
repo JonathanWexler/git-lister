@@ -15,12 +15,12 @@
             <%= card.title %>
               <% if (card.isRepo) { %>
                 <a href="/repos/<%= card._id %>/favorite" class="favorite_link">
-								<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
-								<g transform="scale(.2)">
-									<path class="star" d="m55,237 74-228 74,228L9,96h240"/>
-									</g>
-								</svg>
-							</a>
+									<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+									<g transform="scale(.2)">
+										<path class="star <%= card.isFav ? 'gold' : '' %>" d="m55,237 74-228 74,228L9,96h240"/>
+										</g>
+									</svg>
+								</a>
                 <% } %>
           </div>
           <div class="issue_description">
@@ -44,7 +44,6 @@
         </div>
       </a>
       <% }); %>
-
   </div>
 
 

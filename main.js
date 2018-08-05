@@ -39,18 +39,15 @@ app.get('/', (req, res) => {
 });
 
 app.use((req, res, next) => {
-	console.log('req.user')
-	console.log(req.session)
-	if (req.user == 'undefined') {
+
+	if (!req.user) {
 		res.redirect('/');
 	} else {
-		next(); 
+		next();
 	}
 });
 
 app.get('/repos/:id/favorite', (req, res, next) => {
-	console.log('req.params.id')
-	console.log(req.params.id)
 
 	User.update({_id: req.user._id}, {$addToSet: {favorites: req.params.id} })
 			 .then((r) => {
