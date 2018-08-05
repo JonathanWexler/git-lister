@@ -12,37 +12,41 @@ filterRepoData = (data) => {
 
 	data.forEach((repo) => {
 		repos.push({
-			title: repo.name,
-			id: repo.id,
+			title: repo.title || repo.name,
+			githubId:  repo.githubId || repo.id,
 			description: repo.description,
-			author: repo.owner.login,
-			count: repo.issuesCount,
-			lastUpdated: repo.updated_at,
+			author: repo.author || repo.owner.login,
+			issuesCount: repo.issuesCount,
+			lastUpdated: repo.lastUpdated || repo.updated_at,
 			isRepo: true
 		})
 	});
 
 	return repos;
 },
-updateRepoData = (data) => {
+updateRepoData = (repos) => {
 
-		let updates = [];
+		let reposToUpdate = [],
+				updatedRepos = [],
+				data = filterRepoData(repos);
+
 		data.forEach((repo) => {
-			let update = Repo.update({
+			let update = Repo.findOneAndUpdate({
 										githubId: repo.id
 									}, repo, {
-										upsert: true,
-										setDefaultsOnInsert: true
-									});
-			updates.push(update);
+										"upsert": true,
+										"setDefaultsOnInsert": true,
+										"new": true
+									}).then(r => updatedRepos.push(r));
 
-			// .then((repo) => console.log(repo))
-			// .catch((err) => console.log(err.message));
+			reposToUpdate.push(update);
 		});
 
-		return updates.reduce((promise, item) => {
-							return promise.then(r => console.log(r));
-						}, Promise.resolve());
+		return Promise.all(reposToUpdate).then((values) => {
+			console.log("values updated");
+			return updatedRepos;
+		}).catch( e => console.log(e));
+
 },
 filterIssueData = (data) => {
 	console.log(data);
@@ -72,7 +76,7 @@ module.exports = {
 
 		let rep = gh.getIssues(req.params.author, req.params.repoName);
 		rep.listIssues().then( c => {
-			// console.log(c.data);
+
 			let issues = filterIssueData(c.data);
 			res.render('dashboard', {title: 'Issues', data: issues});
 
@@ -84,26 +88,60 @@ module.exports = {
 
 	repos: (req, res) => {
 
-		let gh = getGithubAccount(req.user);
+		let user = req.user,
+				gh = getGithubAccount(user);
 
-		gh.getUser().listRepos().then((apiRes) =>{
+		gh.getUser()
+			.listRepos()
+			.then( (apiRes) =>{
 
-			let repos = filterRepoData(apiRes.data);
-			updateRepoData(repos)
-					.then((d) => {
-						console.log(d);
-						res.render('dashboard', {title: 'Repos', data: repos});
-					});
+				updateRepoData(apiRes.data)
+						.then((data) => {
 
+							let total = [],
+									results =[];
 
-		}).catch(function (error) {
-			console.log(error.message);
-			res.redirect('/profile');
+							data.forEach((repo) => {
 
-		});
+								let update = User.update({
+															_id: user._id
+														},
+														{
+															$addToSet: {
+																repos: repo._id
+															}
+														},
+														{
+															upsert: true,
+															setDefaultsOnInsert: true,
+															new: true
+														})
+														.then(r => results.push(r))
+														.catch(err => console.log(err));
+
+								total.push(update);
+							});
+
+							Promise.all(total)
+										 .then(() => {
+											 User.findOne({_id: user._id})
+											 		 .populate('repos')
+													 .then((theUser) => {
+														 console.log(theUser.repos)
+
+														 res.render('dashboard', {title: 'Repos', data: theUser.repos});
+											 	 	 });
+										 });
+
+						});
+			})
+			.catch(function (error) {
+				console.log(error.message);
+				res.redirect('/profile');
+			});
+
 
 	},
-
 
 	getGithubAccount: getGithubAccount,
 	filterRepoData: filterRepoData,

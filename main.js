@@ -4,6 +4,7 @@ const express = require('express'),
 	mongoose = require('mongoose'),
 	axios = require('axios'),
 	GithubApi = require('github-api'),
+	expressLayouts = require('express-ejs-layouts'),
 	{User, Repo} = require('./models'),
 	issues = require("./config/data.json"),
 	github = require("./controllers/github.js"),
@@ -12,8 +13,17 @@ const express = require('express'),
 //  DB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gitlister_db', { useNewUrlParser: true });
 
+// Middleware
+app.use((req, res, next) => {
+	// if (!req.user) {
+	// 	res.redirect('/');
+	// }
+	next();
+});
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
 app.use(express.static('public'));
 
 // Middleware sessions
@@ -23,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
+
 // Passport
 const auth = require('./controllers/auth');
 app.use(auth.initialize);
@@ -30,53 +41,19 @@ app.use(auth.session);
 app.get('/login/github', auth.login );
 app.get('/auth/github/callback', auth.authenticate, auth.successRedirect );
 
-// Middleware
-app.use((req, res, next) => {
-	next();
-});
-
 app.get('/', (req, res) => {
-	res.render('index');
+	res.render('index', {layout: false});
 });
 
 app.get('/repos/:id/favorite', (req, res, next) => {
+	console.log('req.params.id')
+	console.log(req.params.id)
 
-	Repo.findOne({_id: req.params.id })
-			.then((repo) => {
-				console.log(req.user)
-				redirect('/repos')
-			});
+	User.update({_id: req.user._id}, {$addToSet: {favorites: req.params.id} })
+			 .then((r) => {
+			 	res.redirect('/repos');
+			 });
 });
-//
-// 	let gh = controller.getGithubAccount(req.user);
-// 	let rep = gh.getRepo(req.params.author, req.params.repoName)
-// 							.getDetails()
-// 							.then( data => {
-// 								let repoData = data.data;
-// 								// console.log(repoData);
-//
-// 								Repo.findOne({ githubId: repoData.id }, (err, repo) => {
-//
-// 									if (!repo) {
-// 										console.log("CREATING")
-// 										Repo.create({
-// 											githubId: repoData.id,
-// 											title: repoData.name,
-// 											description: repoData.description,
-// 											author: repoData.owner.login,
-// 											issues_count: repoData.open_issues_count,
-// 											lastUpdated: repoData.updated_at,
-// 										}, (err, repo) => {
-// 											console.log("CREATED");
-// 											next(err, repo);
-// 										});
-// 									} else {
-// 											next(err, repo);
-// 									}
-// 								});
-// 							})
-// 							.catch(e => console.log(e.message));
-// }, updateUserFavorites);
 
 app.get('/profile', home.profile);
 app.get('/dashboard', home.dashboard );

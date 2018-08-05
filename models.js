@@ -7,6 +7,7 @@ const RepoSchema = new mongoose.Schema({
   author: String,
   issuesCount: Number,
   lastUpdated: Date,
+  isRepo: { type: Boolean, default: true },
 }, {timestamps: true});
 
 const Repo = mongoose.model('Repo', RepoSchema);
@@ -20,7 +21,8 @@ const UserSchema = new mongoose.Schema({
   image: String,
   hash: String,
   salt: String,
-	repos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Repo' }]
+	repos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Repo' }],
+	favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Repo' }]
 }, {timestamps: true});
 
 const User = mongoose.model('User', UserSchema);
