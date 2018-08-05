@@ -14,13 +14,6 @@ const express = require('express'),
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/gitlister_db', { useNewUrlParser: true });
 
 // Middleware
-app.use((req, res, next) => {
-	// if (!req.user) {
-	// 	res.redirect('/');
-	// }
-	next();
-});
-
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
@@ -33,16 +26,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
-
 // Passport
 const auth = require('./controllers/auth');
 app.use(auth.initialize);
 app.use(auth.session);
+
 app.get('/login/github', auth.login );
 app.get('/auth/github/callback', auth.authenticate, auth.successRedirect );
 
 app.get('/', (req, res) => {
 	res.render('index', {layout: false});
+});
+
+app.use((req, res, next) => {
+	console.log('req.user')
+	console.log(req.session)
+	if (req.user == 'undefined') {
+		res.redirect('/');
+	} else {
+		next(); 
+	}
 });
 
 app.get('/repos/:id/favorite', (req, res, next) => {
