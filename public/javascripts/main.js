@@ -19,6 +19,6 @@ $( document )
 
 		let star = $( '.star' );
 		star.click( ( e ) => {
-			alert( 'clicked' );
+			$(e.target).addClass('gold');
 		} );
 	} )

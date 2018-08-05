@@ -181,6 +181,10 @@
   float: left;
 }
 
+.item h2 {
+  font-size: 15px;
+}
+
 .item:hover {
   width: 170px;
   height: 120px;

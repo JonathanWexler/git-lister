@@ -32,7 +32,7 @@ updateRepoData = (repos) => {
 
 		data.forEach((repo) => {
 			let update = Repo.findOneAndUpdate({
-										githubId: repo.id
+										githubId: repo.githubId
 									}, repo, {
 										"upsert": true,
 										"setDefaultsOnInsert": true,
@@ -122,7 +122,7 @@ module.exports = {
 							Promise.all(total)
 										 .then(() => {
 											 User.findOne({_id: user._id})
-											 		 .populate('repos')
+											 		 .populate('repos', null, null, { sort: { 'lastUpdated': -1 } })
 													 .then((user) => {
 														 user.repos.forEach((repo) => {
 															 let fav = user.favorites.some((fav) => { return fav.equals(repo._id)}) ;
