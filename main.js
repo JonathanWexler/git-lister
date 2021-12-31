@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import {User, Repo}  from './models.js';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+dotenv.donfig();
 
 // Unused
 // import axios from 'axios';

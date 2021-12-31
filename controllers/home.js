@@ -7,7 +7,7 @@ const getGithubAccount = (user) => {
 				token: user.githubToken
 			});
 		};
-		const filterRepoData = (data) => {
+const filterRepoData = (data) => {
 	let repos = [];
 
 	data.forEach((repo) => {
