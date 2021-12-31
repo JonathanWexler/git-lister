@@ -1,5 +1,5 @@
 import GithubApi from 'github-api';
-import {User, Repo} from '../models.js';
+import {User, Repo} from '#models';
 
 let getGithubAccount = (user) => {
 	return gh = new GithubApi({

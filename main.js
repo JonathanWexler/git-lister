@@ -1,17 +1,19 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import axios from 'axios';
 import expressSession from 'express-session';
 import morgan from 'morgan';
 import {User, Repo}  from './models.js';
 import expressLayouts from 'express-ejs-layouts';
-import GithubApi from 'github-api';
 import cookieParser from 'cookie-parser';
 
-import github from './controllers/github.js';
-import home from './controllers/home.js';
+// Unused
+// import axios from 'axios';
+// import GithubApi from 'github-api';
+//  import issues from '#config/data.js';
 
-import issues from './config/data.js';
+import github from '#controllers/github.js';
+import home from '#controllers/home.js';
+
 
 const app = express();
 
@@ -35,12 +37,12 @@ app.use(express.json());
 app.use(expressSession({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
 // Passport
-import auth from './controllers/auth.js';
-app.use(auth.initialize);
-app.use(auth.session);
+import AuthController from '#controllers/auth.js';
+app.use(AuthController.initialize);
+app.use(AuthController.session);
 
-app.get('/login/github', auth.login );
-app.get('/auth/github/callback', auth.authenticate, auth.successRedirect );
+app.get('/login/github', AuthController.login );
+app.get('/auth/github/callback', AuthController.authenticate, AuthController.successRedirect );
 
 app.get('/', (req, res) => {
 	res.render('index', {layout: false});

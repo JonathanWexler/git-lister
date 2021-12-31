@@ -5,8 +5,14 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start" : "nodemon main.js",
+    "start": "nodemon main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "imports": {
+    "#controllers/*": "./controllers/*",
+    "#views/*": "./views/*",
+    "#models": "./models.js",
+    "#config/*": "./config/*"
   },
   "author": "Jon Wexler",
   "license": "ISC",

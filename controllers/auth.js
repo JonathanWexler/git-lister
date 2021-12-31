@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy} from 'passport-github'
-import {User} from '../models.js';
+import {User} from '#models';
 
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
