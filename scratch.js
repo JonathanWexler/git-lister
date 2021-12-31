@@ -1,4 +1,4 @@
-const GithubApi = require('github-api');
+import GithubApi from 'github-api';
 
 let getGithubAccount = (user) => {
 			return new GithubApi({

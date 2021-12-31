@@ -1,5 +1,5 @@
-const GithubApi = require('github-api'),
-	{User, Repo} = require('../models');
+import GithubApi from 'github-api';
+import {User, Repo} from '../models.js';
 
 	let getGithubAccount = (user) => {
 				return gh = new GithubApi({
@@ -29,7 +29,7 @@ const GithubApi = require('github-api'),
 				return data;
 			};
 
-module.exports = {
+export default {
 
 	dashboard: (req, res) => {
 		res.render('dashboard', {title: 'Construbtion Database Management', issues: issues});

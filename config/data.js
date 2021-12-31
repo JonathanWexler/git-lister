@@ -1,4 +1,4 @@
-[
+const data = [
 	{
 		"title": "Calendar items won't update when drag and drop disabled",
 		"author": "JonathanWexler",
@@ -24,3 +24,4 @@
 		"status": "stalled"
 	}
 ]
+export default data

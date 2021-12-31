@@ -1,5 +1,5 @@
-const GithubApi = require('github-api'),
-{User, Repo} = require('../models');
+import GithubApi from 'github-api';
+import {User, Repo} from '../models.js';
 
 let getGithubAccount = (user) => {
 	return gh = new GithubApi({
@@ -52,7 +52,7 @@ filterIssueData = (data) => {
 	return data;
 };
 
-module.exports = {
+export default {
 
 	updateUserFavorites: (res, req, err, next) => {
 

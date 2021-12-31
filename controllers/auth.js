@@ -1,6 +1,6 @@
-const passport = require('passport'),
-	GitHubStrategy = require('passport-github').Strategy,
-	{User} = require('../models');
+import passport from 'passport';
+import { Strategy as GitHubStrategy} from 'passport-github'
+import {User} from '../models.js';
 
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
@@ -43,7 +43,7 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
-module.exports = {
+export default {
 	authenticate: passport.authenticate('github', { failureRedirect: '/login/github' }),
 	successRedirect: (req, res) => {
 	    res.redirect('/profile');

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const RepoSchema = new mongoose.Schema({
   title: String,
@@ -10,7 +10,7 @@ const RepoSchema = new mongoose.Schema({
   isRepo: { type: Boolean, default: true },
 }, {timestamps: true});
 
-const Repo = mongoose.model('Repo', RepoSchema);
+export const Repo = mongoose.model('Repo', RepoSchema);
 
 const UserSchema = new mongoose.Schema({
   username: String,
@@ -25,10 +25,4 @@ const UserSchema = new mongoose.Schema({
 	favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Repo' }]
 }, {timestamps: true});
 
-const User = mongoose.model('User', UserSchema);
-
-module.exports = {
-
-		User: User,
-		Repo: Repo,
-}
+export const User = mongoose.model('User', UserSchema);
