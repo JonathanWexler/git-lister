@@ -6,22 +6,22 @@ import {User, Repo}  from './models.js';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-dotenv.donfig();
+dotenv.config();
 
 // Unused
 // import axios from 'axios';
 // import GithubApi from 'github-api';
 //  import issues from '#config/data.js';
 
-import github from '#controllers/github.js';
-import home from '#controllers/home.js';
+import GithubController from '#controllers/github.js';
+import HomeController from '#controllers/home.js';
+import AuthController from '#controllers/auth.js';
 
 
 const app = express();
-
 //  DB
 mongoose.connect(
-	process.env.MONGODB_URI || 'mongodb://localhost:27017/gitlister_db',
+	process.env.MONGODB_URI,
 	{ useNewUrlParser: true }
 );
 
@@ -39,7 +39,6 @@ app.use(express.json());
 app.use(expressSession({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
 // Passport
-import AuthController from '#controllers/auth.js';
 app.use(AuthController.initialize);
 app.use(AuthController.session);
 
@@ -67,13 +66,13 @@ app.get('/repos/:id/favorite', (req, res, next) => {
 			 });
 });
 
-app.get('/profile', home.profile);
-app.get('/dashboard', home.dashboard );
+app.get('/profile', HomeController.profile);
+app.get('/dashboard', HomeController.dashboard );
 
-app.get('/repo/:author/:repoName', github.showRepo );
-app.get('/repos', github.repos );
+app.get('/repo/:author/:repoName', GithubController.showRepo );
+app.get('/repos', GithubController.repos );
 
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT, () => {
 	console.log('listening');
 })

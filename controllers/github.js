@@ -52,100 +52,99 @@ filterIssueData = (data) => {
 	return data;
 };
 
-export default {
+const repos = (req, res) => {
 
-	updateUserFavorites: (res, req, err, next) => {
+	let user = req.user,
+			gh = getGithubAccount(user);
 
-		User.findOneAndUpdate({
-			_id: req.user.id
-		} , {
-			$push:{
-				repos: req.repo
-			}
-		}, {
-			new:true
-		}).then(() => {
-			res.redirect('/')
-		});
-	},
-	showRepo: (req, res) => {
-		let gh = getGithubAccount(req.user);
+	gh.getUser()
+		.listRepos()
+		.then( (apiRes) =>{
 
-		let rep = gh.getIssues(req.params.author, req.params.repoName);
-		rep.listIssues().then( c => {
+			updateRepoData(apiRes.data)
+					.then((data) => {
 
-			let issues = filterIssueData(c.data);
-			res.render('dashboard', {title: 'Issues', data: issues});
+						let total = [],
+								results =[];
 
-		}).catch(e => {
-			console.log(e.message);
-			res.redirect('/profile');
-		})
-	},
+						data.forEach((repo) => {
 
-	repos: (req, res) => {
+							let update = User.update({
+														_id: user._id
+													},
+													{
+														$addToSet: {
+															repos: repo._id
+														}
+													},
+													{
+														upsert: true,
+														setDefaultsOnInsert: true,
+														new: true
+													})
+													.then(r => results.push(r))
+													.catch(err => console.log(err));
 
-		let user = req.user,
-				gh = getGithubAccount(user);
-
-		gh.getUser()
-			.listRepos()
-			.then( (apiRes) =>{
-
-				updateRepoData(apiRes.data)
-						.then((data) => {
-
-							let total = [],
-									results =[];
-
-							data.forEach((repo) => {
-
-								let update = User.update({
-															_id: user._id
-														},
-														{
-															$addToSet: {
-																repos: repo._id
-															}
-														},
-														{
-															upsert: true,
-															setDefaultsOnInsert: true,
-															new: true
-														})
-														.then(r => results.push(r))
-														.catch(err => console.log(err));
-
-								total.push(update);
-							});
-
-							Promise.all(total)
-										 .then(() => {
-											 User.findOne({_id: user._id})
-											 		 .populate('repos', null, null, { sort: { 'lastUpdated': -1 } })
-													 .then((user) => {
-														 user.repos.forEach((repo) => {
-															 let fav = user.favorites.some((fav) => { return fav.equals(repo._id)}) ;
-															 if (fav) {
-															 	repo.isFav = true;
-															 }
-														 })
-														 res.render('dashboard', {title: 'Repos', user: user, data: user.repos });
-											 	 	 });
-										 });
-
+							total.push(update);
 						});
-			})
-			.catch(function (error) {
-				console.log(error.message);
-				res.redirect('/profile');
-			});
+
+						Promise.all(total)
+									 .then(() => {
+										 User.findOne({_id: user._id})
+													.populate('repos', null, null, { sort: { 'lastUpdated': -1 } })
+												 .then((user) => {
+													 user.repos.forEach((repo) => {
+														 let fav = user.favorites.some((fav) => { return fav.equals(repo._id)}) ;
+														 if (fav) {
+															 repo.isFav = true;
+														 }
+													 })
+													 res.render('dashboard', {title: 'Repos', user: user, data: user.repos });
+													 });
+									 });
+
+					});
+		})
+		.catch(function (error) {
+			console.log(error.message);
+			res.redirect('/profile');
+		});
 
 
-	},
+}
+const showRepo = (req, res) => {
+	let gh = getGithubAccount(req.user);
 
-	getGithubAccount: getGithubAccount,
-	filterRepoData: filterRepoData,
-	filterIssueData: filterIssueData,
+	let rep = gh.getIssues(req.params.author, req.params.repoName);
+	rep.listIssues().then( c => {
 
+		let issues = filterIssueData(c.data);
+		res.render('dashboard', {title: 'Issues', data: issues});
+
+	}).catch(e => {
+		console.log(e.message);
+		res.redirect('/profile');
+	})
+}
+const updateUserFavorites = (res, req, err, next) => {
+	User.findOneAndUpdate({
+		_id: req.user.id
+	} , {
+		$push:{
+			repos: req.repo
+		}
+	}, {
+		new:true
+	}).then(() => {
+		res.redirect('/')
+	});
+}
+
+export default {
+	updateUserFavorites,
+	showRepo,
+	repos,
+	getGithubAccount,
+	filterRepoData,
+	filterIssueData,
 };
