@@ -1,13 +1,14 @@
 import GithubApi from 'github-api';
 import {User, Repo} from '#models';
 
-let getGithubAccount = (user) => {
-	return gh = new GithubApi({
-		username: user.username,
-		token: user.githubToken
+const getGithubAccount = user => {
+	const {username, githubToken: token} = user;
+	return new GithubApi({
+		username,
+		token
 	});
-},
-filterRepoData = (data) => {
+}
+const filterRepoData = (data) => {
 	let repos = [];
 
 	data.forEach((repo) => {
@@ -23,8 +24,8 @@ filterRepoData = (data) => {
 	});
 
 	return repos;
-},
-updateRepoData = (repos) => {
+}
+const updateRepoData = (repos) => {
 
 		let reposToUpdate = [],
 				updatedRepos = [],
@@ -47,8 +48,8 @@ updateRepoData = (repos) => {
 			return updatedRepos;
 		}).catch( e => console.log(e));
 
-},
-filterIssueData = (data) => {
+}
+const filterIssueData = (data) => {
 	return data;
 };
 
@@ -56,7 +57,7 @@ const repos = (req, res) => {
 
 	let user = req.user,
 			gh = getGithubAccount(user);
-
+	console.log('GETTING REPO', gh);
 	gh.getUser()
 		.listRepos()
 		.then( (apiRes) =>{
