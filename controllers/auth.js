@@ -8,7 +8,6 @@ const passportCallback = async (accessToken, refreshToken, profile, next) => {
 		const {id: githubId} = profile;
 		console.log('ABOUT TO FIND USER', githubId)
 		let user = await User.findOne( { where: { githubId } });
-		console.log('FINDING USER', user)
 		if (!user) {
 			console.log('CREATING USER', profile)
 			let createdUser = await User.create({
@@ -18,16 +17,9 @@ const passportCallback = async (accessToken, refreshToken, profile, next) => {
 			});
 			return next(err, createdUser);
 		} else {
-			console.log('UPDATING USER', user.id)
-			const updatedUser = await User.update({
-				githubToken: accessToken
-			},
-			{
-				where: {
-					id: user.id
-				}
-			})
-			return next(err, updatedUser);
+			user.githubToken = accessToken;
+			await user.save();
+			return next(err, user);
 		}
 	} catch (e) {
 		console.log('ERROR:', e);

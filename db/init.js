@@ -12,11 +12,14 @@ const sequelize = new Sequelize(process.env.DB_URL, {
 export const User = UserSchema(sequelize, DataTypes);
 export const Repo = RepoSchema(sequelize, DataTypes);
 
-User.belongsToMany(Repo, { as: 'repo', through: 'UserRepos' });
-Repo.belongsToMany(User, { as: 'user', through: 'UserRepos' });
+Repo.belongsTo(User);
+User.hasMany(Repo);
 
-Repo.belongsToMany(User, { as: 'favorite', through: 'Favorites' });
-User.belongsToMany(Repo, { as: 'userFavorite', through: 'Favorites' });
+User.belongsToMany(Repo, { as: 'connectedUsers', through: 'UserRepos' });
+Repo.belongsToMany(User, { as: 'connectedRepos', through: 'UserRepos' });
+
+Repo.belongsToMany(User, { as: 'favorites', through: 'Favorites' });
+User.belongsToMany(Repo, { as: 'favorites', through: 'Favorites' });
 
 try {
   await sequelize.sync();

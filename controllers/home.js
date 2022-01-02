@@ -29,17 +29,32 @@ const filterIssueData = (data) => {
 	return data;
 };
 
+const favoriteRepo = async (req, res, next) => {
+	console.log('FAVORITING', req.params.id, req.user.id)
+	try {
+		const user = await User.findOne( { where: { id: req.user.id } });
+
+		console.log('usersss', user)
+		const repo = await Repo.findOne({ where: {
+			id: req.params.id
+		}});
+		await user.addFavorite(repo);
+		res.redirect('/repos');
+	} catch (e) {
+		console.log(e)
+	}
+}
+
 const dashboard = (req, res) => {
 	res.render('dashboard', {title: 'Construbtion Database Management', issues});
 }
 const profile = async (req, res) => {
 try {
-	const [id] = req.user;
-	const user = await User.findOne({ where: { id }})
-	console.log('UUUSER', user)
-	const favorites = await user.getFavoritess()
-	console.log('favorites', favorites);
-	user.favorites = []
+	const {id} = req.user;
+	const user = await User.findOne({ where: { id }, include: 'favorites'})
+	// console.log(Object.keys(user.__proto__));
+
+  // const favorites = await user.getFavorites()
 	// req.repos
 	res.render('profile', { user, repos: [] });
 } catch (e) {
@@ -50,5 +65,6 @@ try {
 
 export default {
 	dashboard,
-	profile
+	profile,
+	favoriteRepo
 };

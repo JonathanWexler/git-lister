@@ -7,27 +7,12 @@ import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 dotenv.config();
-// import '#mailer/sendgrid.js'
-
-// Unused
-// import axios from 'axios';
-// import GithubApi from 'github-api';
-//  import issues from '#config/data.js';
 
 import GithubController from '#controllers/github.js';
 import HomeController from '#controllers/home.js';
 import AuthController from '#controllers/auth.js';
 
-
 const app = express();
-//  DB
-// mongoose.connect(
-// 	process.env.MONGODB_URI,
-// 	{ useNewUrlParser: true }
-// );
-
-// Middleware
-// app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.use(express.static('public'));
@@ -47,7 +32,9 @@ app.get('/login/github', AuthController.login );
 app.get('/auth/github/callback', AuthController.authenticate, AuthController.successRedirect );
 
 app.get('/', (req, res) => {
-	res.render('index', {layout: false});
+	const { user } = req;
+	if (user) res.redirect('/profile');
+	else res.render('index', {layout: false});
 });
 
 app.use((req, res, next) => {
@@ -59,20 +46,11 @@ app.use((req, res, next) => {
 	}
 });
 
-app.get('/repos/:id/favorite', async (req, res, next) => {
-	const user = await User.findOne({ where: {
-		id: req.user.id
-	}});
-	const repo = await Repo.findOne({ where: {
-		id: req.params.id
-	}});
-	user.addFavorite(repo);
-	res.redirect('/repos');
-});
-
+app.get('/repos/:id/favorite', HomeController.favoriteRepo);
 app.get('/profile', HomeController.profile);
 app.get('/dashboard', HomeController.dashboard );
 
+app.get('/repos/fetch', GithubController.fetchRepos );
 app.get('/repo/:author/:repoName', GithubController.showRepo );
 app.get('/repos', GithubController.repos );
 
