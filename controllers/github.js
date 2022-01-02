@@ -54,7 +54,6 @@ const filterIssueData = (data) => {
 };
 
 const repos = (req, res) => {
-
 	let user = req.user,
 			gh = getGithubAccount(user);
 	console.log('GETTING REPO', gh);

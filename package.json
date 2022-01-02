@@ -12,11 +12,13 @@
     "#controllers/*": "./controllers/*",
     "#views/*": "./views/*",
     "#models": "./models.js",
-    "#config/*": "./config/*"
+    "#config/*": "./config/*",
+    "#mailer/*": "./mailer/*"
   },
   "author": "Jon Wexler",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.0",
     "axios": "^0.18.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^10.0.0",

@@ -7,6 +7,7 @@ import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 dotenv.config();
+import '#mailer/sendgrid.js'
 
 // Unused
 // import axios from 'axios';
