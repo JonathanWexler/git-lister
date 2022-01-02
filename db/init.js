@@ -6,7 +6,10 @@ import UserSchema from '#models/user.js';
 import RepoSchema from '#models/repo.js';
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres'
+  dialect: 'postgres',
+  dialectOptions: {
+    'ssl': true
+  }
 })
 
 export const User = UserSchema(sequelize, DataTypes);
