@@ -1,35 +1,38 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github'
-import {User} from '#models';
+import {User} from '#models/index.js';
 
-const passportCallback = (accessToken, refreshToken, profile, next) => {
-	const {id: githubId} = profile;
-	User.findOne({ githubId }, (err, user) => {
+const passportCallback = async (accessToken, refreshToken, profile, next) => {
+	let err = null;
+	try {
+		const {id: githubId} = profile;
+		console.log('ABOUT TO FIND USER', githubId)
+		let user = await User.findOne( { where: { githubId } });
 		console.log('FINDING USER', user)
 		if (!user) {
 			console.log('CREATING USER', profile)
-			User.create({
+			let createdUser = await User.create({
 				githubId: profile.id,
 				githubToken: accessToken,
 				username: profile.username
-			}, (err, user) => {
-				return next(err, user);
 			});
+			return next(err, createdUser);
 		} else {
-			console.log('UPDATING USER', accessToken)
-			User.findOneAndUpdate({
-				_id: user.id
-			} , {
-				$set:{
-					githubToken: accessToken
+			console.log('UPDATING USER', user.id)
+			const updatedUser = await User.update({
+				githubToken: accessToken
+			},
+			{
+				where: {
+					id: user.id
 				}
-			}, {
-				new:true
-			}).then(() => {
-				return next(err, user);
-			});
+			})
+			return next(err, updatedUser);
 		}
-	});
+	} catch (e) {
+		console.log('ERROR:', e);
+	}
+	
 }
 const authenticate = passport.authenticate('github', { failureRedirect: '/login/github' });
 const successRedirect =(req, res) => {

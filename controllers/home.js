@@ -1,5 +1,5 @@
 import GithubApi from 'github-api';
-import {User, Repo} from '#models';
+import {User, Repo} from '#models/index.js';
 
 const getGithubAccount = (user) => {
 			return gh = new GithubApi({
@@ -30,15 +30,22 @@ const filterIssueData = (data) => {
 };
 
 const dashboard = (req, res) => {
-	res.render('dashboard', {title: 'Construbtion Database Management', issues: issues});
+	res.render('dashboard', {title: 'Construbtion Database Management', issues});
 }
-const profile = (req, res) => {
-	// if (req.isAuthenticated()) {
-	User.findOne({_id: req.user._id})
-			.populate('favorites')
-			.then( (user) => {
-				res.render('profile', { user: user, repos: req.repos });
-			});
+const profile = async (req, res) => {
+try {
+	const [id] = req.user;
+	const user = await User.findOne({ where: { id }})
+	console.log('UUUSER', user)
+	const favorites = await user.getFavoritess()
+	console.log('favorites', favorites);
+	user.favorites = []
+	// req.repos
+	res.render('profile', { user, repos: [] });
+} catch (e) {
+	console.log('HOME', e)
+}
+
 }
 
 export default {

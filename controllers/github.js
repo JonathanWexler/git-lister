@@ -1,5 +1,5 @@
 import GithubApi from 'github-api';
-import {User, Repo} from '#models';
+import {User, Repo} from '#models/index.js';
 
 const getGithubAccount = user => {
 	const {username, githubToken: token} = user;
@@ -25,119 +25,75 @@ const filterRepoData = (data) => {
 
 	return repos;
 }
-const updateRepoData = (repos) => {
-
-		let reposToUpdate = [],
-				updatedRepos = [],
+const updateRepoData = async (repos) => {
+		let updatedRepos = [],
 				data = filterRepoData(repos);
 
-		data.forEach((repo) => {
-			let update = Repo.findOneAndUpdate({
-										githubId: repo.githubId
-									}, repo, {
-										"upsert": true,
-										"setDefaultsOnInsert": true,
-										"new": true
-									}).then(r => updatedRepos.push(r));
-
-			reposToUpdate.push(update);
+		data.forEach(async (repoData) => {
+			const repo = await Repo.update(repoData, { where: {
+				githubId: repoData.githubId
+			}})
+			updatedRepos.push(repo);
 		});
 
-		return Promise.all(reposToUpdate).then((values) => {
-			console.log("values updated");
-			return updatedRepos;
-		}).catch( e => console.log(e));
-
+		return updatedRepos;
 }
 const filterIssueData = (data) => {
 	return data;
 };
 
-const repos = (req, res) => {
-	let user = req.user,
-			gh = getGithubAccount(user);
-	console.log('GETTING REPO', gh);
-	gh.getUser()
-		.listRepos()
-		.then( (apiRes) =>{
+const repos = async (req, res) => {
+	try {
+		const {user: userObject} = req;
+		const gh = getGithubAccount(userObject);
 
-			updateRepoData(apiRes.data)
-					.then((data) => {
+		console.log('GETTING REPO', gh);
+		const apiRes = await gh.getUser()
+			.listRepos();
 
-						let total = [],
-								results =[];
+		const data = updateRepoData(apiRes.data);
 
-						data.forEach((repo) => {
-
-							let update = User.update({
-														_id: user._id
-													},
-													{
-														$addToSet: {
-															repos: repo._id
-														}
-													},
-													{
-														upsert: true,
-														setDefaultsOnInsert: true,
-														new: true
-													})
-													.then(r => results.push(r))
-													.catch(err => console.log(err));
-
-							total.push(update);
-						});
-
-						Promise.all(total)
-									 .then(() => {
-										 User.findOne({_id: user._id})
-													.populate('repos', null, null, { sort: { 'lastUpdated': -1 } })
-												 .then((user) => {
-													 user.repos.forEach((repo) => {
-														 let fav = user.favorites.some((fav) => { return fav.equals(repo._id)}) ;
-														 if (fav) {
-															 repo.isFav = true;
-														 }
-													 })
-													 res.render('dashboard', {title: 'Repos', user: user, data: user.repos });
-													 });
-									 });
-
-					});
-		})
-		.catch(function (error) {
-			console.log(error.message);
-			res.redirect('/profile');
+		const user = await User.findOne(
+			{ where: {
+			id: user.id
+			}
 		});
 
+		data.forEach(async (repo) => {
+			const newRepo = await Repo.create(repo)
+			await user.addRepo(newRepo)
+		});
 
+		res.render('dashboard', {
+			title: 'Repos',
+			user,
+			data: user.repos
+		});
+	} catch (error) {
+		console.log(error.message);
+		res.redirect('/profile');
+	}
 }
-const showRepo = (req, res) => {
-	let gh = getGithubAccount(req.user);
+const showRepo = async (req, res) => {
+	const {user: userObject} = req;
+	let gh = getGithubAccount(userObject);
 
 	let rep = gh.getIssues(req.params.author, req.params.repoName);
-	rep.listIssues().then( c => {
-
-		let issues = filterIssueData(c.data);
+	try {
+		const issueData = await rep.listIssues()
+		let issues = filterIssueData(issueData.data);
 		res.render('dashboard', {title: 'Issues', data: issues});
-
-	}).catch(e => {
-		console.log(e.message);
+	}catch (error) {
+		console.log(error.message);
 		res.redirect('/profile');
-	})
+	}
 }
-const updateUserFavorites = (res, req, err, next) => {
-	User.findOneAndUpdate({
-		_id: req.user.id
-	} , {
-		$push:{
-			repos: req.repo
-		}
-	}, {
-		new:true
-	}).then(() => {
-		res.redirect('/')
-	});
+const updateUserFavorites = async (res, req, err, next) => {
+	const user = await User.findOne({	where: {
+		id: req.user.id
+	}})
+	// user.addRepo()
+	res.redirect('/')
 }
 
 export default {

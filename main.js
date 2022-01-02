@@ -7,7 +7,7 @@ import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 dotenv.config();
-import '#mailer/sendgrid.js'
+// import '#mailer/sendgrid.js'
 
 // Unused
 // import axios from 'axios';
@@ -21,10 +21,10 @@ import AuthController from '#controllers/auth.js';
 
 const app = express();
 //  DB
-mongoose.connect(
-	process.env.MONGODB_URI,
-	{ useNewUrlParser: true }
-);
+// mongoose.connect(
+// 	process.env.MONGODB_URI,
+// 	{ useNewUrlParser: true }
+// );
 
 // Middleware
 // app.set('views', __dirname + '/views');
@@ -59,12 +59,15 @@ app.use((req, res, next) => {
 	}
 });
 
-app.get('/repos/:id/favorite', (req, res, next) => {
-
-	User.update({_id: req.user._id}, {$addToSet: {favorites: req.params.id} })
-			 .then((r) => {
-			 	res.redirect('/repos');
-			 });
+app.get('/repos/:id/favorite', async (req, res, next) => {
+	const user = await User.findOne({ where: {
+		id: req.user.id
+	}});
+	const repo = await Repo.findOne({ where: {
+		id: req.params.id
+	}});
+	user.addFavorite(repo);
+	res.redirect('/repos');
 });
 
 app.get('/profile', HomeController.profile);
