@@ -4,15 +4,18 @@ dotenv.config();
 
 import UserSchema from '#models/user.js';
 import RepoSchema from '#models/repo.js';
-
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres',
-  dialectOptions: {
+let dialectOptions = {}
+if (!process.env.DEV) {
+  dialectOptions = {
     ssl: {
       require: true,
       rejectUnauthorized: false
     }
   }
+}
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  dialectOptions
 })
 
 export const User = UserSchema(sequelize, DataTypes);
