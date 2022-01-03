@@ -15,6 +15,8 @@ const passportCallback = async (githubToken, refreshToken, profile, next) => {
 			const createdUser = await User.create({
 				githubId,
 				githubToken,
+				firstName,
+				lastName,
 				username,
 				email,
 				imageURL
