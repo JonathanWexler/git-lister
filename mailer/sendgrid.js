@@ -1,5 +1,6 @@
 import sgMail from '@sendgrid/mail';
 import {mailMessageGenerator} from '#mailer/mailHTML.js'
+import {welcomeMessage} from '#mailer/welcomeHTML.js'
 import dotenv from 'dotenv';
 dotenv.config();
 console.log('process.env.SENDGRID_API_KEY', process.env.SENDGRID_API_KEY)
@@ -32,19 +33,32 @@ const html = `
 </div>
 </div>
 `
-const msg = {
-  to: 'jonathanrwexler@gmail.com', // Change to your recipient
-  from: 'report@gitlister.com', // Change to your verified sender
-  subject: `Gitlister Report ${today.toDateString()}`,
-  // text: 'Here is the update:',
-  html: mailMessageGenerator(demoData),
-}
 
-sgMail
-  .send(msg)
-  .then(() => {
-    console.log('Email sent')
-  })
-  .catch((error) => {
-    console.error(error)
-  })
+
+  const sendMessage = (subject, html, email) => {
+    const msg = {
+      to: email || 'logorithms@gmail.com',
+      from: 'report@gitlister.com',
+      subject,
+      html,
+    }
+    
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log('Email sent')
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+
+  export const reportEmail = () => {
+    const subject = `Gitlister Report ${today.toDateString()}`;
+    sendMessage(subject, mailMessageGenerator(demoData))
+  }
+
+  export const welcomeEmail = (username, email) => {
+    const subject = `Welcome to Gitlister`;
+    sendMessage(subject, welcomeMessage(username), email)
+  }

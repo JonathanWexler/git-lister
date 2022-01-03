@@ -1,6 +1,7 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github'
 import {User} from '#models/index.js';
+import {welcomeEmail} from '#mailer/sendgrid.js'
 
 const passportCallback = async (accessToken, refreshToken, profile, next) => {
 	let err = null;
@@ -13,10 +14,15 @@ const passportCallback = async (accessToken, refreshToken, profile, next) => {
 			let createdUser = await User.create({
 				githubId: profile.id,
 				githubToken: accessToken,
-				username: profile.username
+				username: profile.username,
+				email: profile._json.email
 			});
+			if (createdUser) {
+				welcomeEmail(createdUser.username, createdUser.email)
+			}
 			return next(err, createdUser);
 		} else {
+			welcomeEmail(user.username, user.email)
 			user.githubToken = accessToken;
 			await user.save();
 			return next(err, user);
