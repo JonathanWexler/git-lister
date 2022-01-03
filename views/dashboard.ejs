@@ -12,43 +12,26 @@
 
   <div class="project">
     <% data.forEach((card) => { %>
-      <a href="/repo/<%= card.author %>/<%= card.title %>/">
-        <div class="issue">
-          <span class="issue_status <%= card.status %>">
-					</span>
-
-          <div class="issue_title">
-            <%= card.title %>
-              <% if (card.isRepo) { %>
-                <a href="/repos/<%= card.id %>/favorite" class="favorite_link">
-									<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
-									<g transform="scale(.2)">
-										<path class="star <%= card.isFav ? 'gold' : '' %>" d="m55,237 74-228 74,228L9,96h240"/>
-										</g>
-									</svg>
-								</a>
-                <% } %>
-          </div>
-          <div class="issue_description">
-            <%= card.description %>
-          </div>
-
-          <div class="issue_footer">
-            <div class="issue_author">
-              <%= card.author %>
-            </div>
-
-            <div class="issue_count">
-              <%= card.count %> comments...
-            </div>
-
-            <div class="issue_date">
-              <%= card.lastUpdated %>
-            </div>
-          </div>
-
+      <div class="card">
+        <div class="card-header repo-card-header">
+          Last Updated: <%= card.lastUpdated %> <%= card.status %>
+          <% if (card.isRepo) { %>
+            <a href="/repos/<%= card.id %>/favorite" class="favorite-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+              <g transform="scale(.2)">
+                <path class="star <%= card.isFav ? 'gold' : '' %>" d="m55,237 74-228 74,228L9,96h240"/>
+                </g>
+              </svg>
+            </a>
+            <% } %>
         </div>
-      </a>
+        <div class="card-body">
+          <h5 class="card-title"><%= card.title %></h5>
+          <p class="card-text"><%= card.author %></p>
+          <p class="card-text"><%= card.description %></p>
+          <a href="/repo/<%= card.author %>/<%= card.title %>/" class="btn btn-primary">Visit</a>
+        </div>
+      </div>
       <% }); %>
   </div>
 

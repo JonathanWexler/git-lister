@@ -26,7 +26,6 @@
 
 .project {
   width: 60%;
-  background-color: white;
   min-height: 200px;
   padding-top: 25px;
   padding-bottom: 25px;
@@ -216,4 +215,19 @@
 
 a {
   text-decoration: none;
+}
+
+.repo-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card {
+  margin-bottom: 10px;
+}
+#navbarNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

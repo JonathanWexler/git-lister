@@ -38,6 +38,7 @@ const navItems = [
 		path: '/repos'
 	}
 ];
+
 // Passport
 app.use(AuthController.initialize);
 app.use(AuthController.session);

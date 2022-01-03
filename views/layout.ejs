@@ -16,6 +16,13 @@
             </li>
           <% }) %>
         </ul>
+        <ul class="navbar-nav navbar-right">
+          <% if (user) {%>
+            <li class="nav-item">
+              <%= user.username %>
+            </li>
+          <% } %>
+        </ul>
       </div>
     </div>
   </nav>

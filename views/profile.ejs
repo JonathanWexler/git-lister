@@ -2,21 +2,32 @@
   <div class="profile">
     <% if (user) { %>
       <h1>User: <%= user.username %> </h1>
-      <div class="favorites">
+      <div class="favorites bg-light">
         <% user.favorites.forEach((favorite) => {%>
-          <div class="item">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Five-pointed_star.svg/2000px-Five-pointed_star.svg.png" class="star" alt="">
-            <h2> <%= favorite.title%></h2>
+
+          <div class="card">
+            <div class="card-header repo-card-header">
+              <% if (favorite.isRepo) { %>
+                <a href="/repos/<%= favorite.id %>/favorite" class="favorite-link">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                  <g transform="scale(.2)">
+                    <path class="star gold" d="m55,237 74-228 74,228L9,96h240"/>
+                    </g>
+                  </svg>
+                </a>
+                <% } %>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title"><%= favorite.title %></h5>
+              <p class="card-text"><%= favorite.author %></p>
+              <p class="card-text"><%= favorite.description %></p>
+              <a href="/repo/<%= favorite.author %>/<%= favorite.title %>/" class="btn btn-primary">Visit</a>
+            </div>
           </div>
           <% }); %>
       </div>
       <% } %>
-        <a class="" href="/repos">
-
-          <div class="repo_button">
-            Repos
-          </div>
-        </a>
+      <a href="/repos" class="btn btn-primary">All Repos</a>
   </div>
 
   <% if (repos) { %>
