@@ -1,12 +1,15 @@
 import GithubApi from 'github-api';
-import {User, Repo} from '#models/index.js';
+import {
+	User,
+	Repo
+} from '#models/index.js';
 
 const getGithubAccount = (user) => {
-			return gh = new GithubApi({
-				username: 'JonathanWexler',
-				token: user.githubToken
-			});
-		};
+	return gh = new GithubApi({
+		username: 'JonathanWexler',
+		token: user.githubToken
+	});
+};
 const filterRepoData = (data) => {
 	let repos = [];
 
@@ -32,12 +35,17 @@ const filterIssueData = (data) => {
 const favoriteRepo = async (req, res, next) => {
 	console.log('FAVORITING', req.params.id, req.user.id)
 	try {
-		const user = await User.findOne( { where: { id: req.user.id } });
+		const user = await User.findOne({
+			where: {
+				id: req.user.id
+			}
+		});
 
-		console.log('usersss', user)
-		const repo = await Repo.findOne({ where: {
-			id: req.params.id
-		}});
+		const repo = await Repo.findOne({
+			where: {
+				id: req.params.id
+			}
+		});
 		await user.addFavorite(repo);
 		res.redirect('/repos');
 	} catch (e) {
@@ -46,23 +54,32 @@ const favoriteRepo = async (req, res, next) => {
 }
 
 const dashboard = (req, res) => {
-	res.render('dashboard', {title: 'Construbtion Database Management', issues});
+	renderPage(req, res, 'dashboard', {title: 'Construbtion Database Management',	issues});
 }
 const profile = async (req, res) => {
-try {
-	const {id} = req.user;
-	const user = await User.findOne({ where: { id }, include: 'favorites'})
-	// console.log(Object.keys(user.__proto__));
-
-  // const favorites = await user.getFavorites()
-	// req.repos
-	res.render('profile', { user, repos: [] });
-} catch (e) {
-	console.log('HOME', e)
+	try {
+		const {
+			id
+		} = req.user;
+		const user = await User.findOne({
+			where: {
+				id
+			},
+			include: 'favorites'
+		})
+		// console.log(Object.keys(user.__proto__));
+		renderPage(req, res, 'profile', {user, repos: []})
+	} catch (e) {
+		console.log('HOME', e)
+	}
 }
 
+const renderPage = (req, res, page, options) => {
+	const {user, navItems} = req;
+	console.log('NAV ITEMSS', navItems)
+	options = {user, ...options, navItems}
+	res.render(page, options);
 }
-
 export default {
 	dashboard,
 	profile,

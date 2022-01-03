@@ -1,9 +1,15 @@
 import GithubApi from 'github-api';
-import {User, Repo} from '#models/index.js';
+import {
+	User,
+	Repo
+} from '#models/index.js';
 
 const getGithubAccount = user => {
 	console.log('user', user)
-	const {username, githubToken: token} = user;
+	const {
+		username,
+		githubToken: token
+	} = user;
 	return new GithubApi({
 		username,
 		token
@@ -15,7 +21,7 @@ const filterRepoData = (data) => {
 	data.forEach((repo) => {
 		repos.push({
 			title: repo.title || repo.name,
-			githubId:  repo.githubId || repo.id,
+			githubId: repo.githubId || repo.id,
 			description: repo.description,
 			author: repo.author || repo.owner.login,
 			issuesCount: repo.issuesCount,
@@ -27,20 +33,22 @@ const filterRepoData = (data) => {
 	return repos;
 }
 const updateRepoData = async (repos) => {
-		const updatedRepos = [];
-		const data = filterRepoData(repos);
+	const updatedRepos = [];
+	const data = filterRepoData(repos);
 
-		data.forEach(async (repoData) => {
-			const repo = await Repo.update(repoData, { where: {
+	data.forEach(async (repoData) => {
+		const repo = await Repo.update(repoData, {
+			where: {
 				githubId: repoData.githubId
-			}})
-			console.log(repoData)
-			updatedRepos.push(repo);
-		});
-		console.log('DONE')
+			}
+		})
+		console.log(repoData)
+		updatedRepos.push(repo);
+	});
+	console.log('DONE')
 
 
-		return updatedRepos;
+	return updatedRepos;
 }
 const filterIssueData = (data) => {
 	return data;
@@ -51,8 +59,17 @@ const createOrUpdateRepos = async (repos, user) => {
 
 	for (let repoData of data) {
 		try {
-			const {githubId} = repoData;
-			await Repo.upsert({...repoData, UserId: user.id}, {where: { githubId }})
+			const {
+				githubId
+			} = repoData;
+			await Repo.upsert({
+				...repoData,
+				UserId: user.id
+			}, {
+				where: {
+					githubId
+				}
+			})
 		} catch (error) {
 			console.log("Err", error)
 		}
@@ -60,9 +77,13 @@ const createOrUpdateRepos = async (repos, user) => {
 }
 
 const fetchRepos = async (req, res) => {
-	const {user: userObject} = req;
+	const {
+		user: userObject
+	} = req;
 	const gh = getGithubAccount(userObject);
-	const {data: apiRes} = await gh.getUser()
+	const {
+		data: apiRes
+	} = await gh.getUser()
 		.listRepos();
 
 	const user = await User.findOne({
@@ -77,7 +98,9 @@ const fetchRepos = async (req, res) => {
 
 const repos = async (req, res) => {
 	try {
-		const {user: userObject} = req;
+		const {
+			user: userObject
+		} = req;
 		const user = await User.findOne({
 			where: {
 				id: userObject.id
@@ -89,7 +112,7 @@ const repos = async (req, res) => {
 		for (let r of repos) {
 			if (favorites.includes(r.id)) r.isFav = true;
 		}
-		res.render('dashboard', {
+		renderPage(req, res, 'dashboard', {
 			title: 'Repos',
 			user,
 			data: repos
@@ -100,25 +123,45 @@ const repos = async (req, res) => {
 	}
 }
 const showRepo = async (req, res) => {
-	const {user: userObject} = req;
+	const {
+		user: userObject
+	} = req;
 	let gh = getGithubAccount(userObject);
 
 	let rep = gh.getIssues(req.params.author, req.params.repoName);
 	try {
 		const issueData = await rep.listIssues()
 		let issues = filterIssueData(issueData.data);
-		res.render('dashboard', {title: 'Issues', data: issues});
-	}catch (error) {
+		renderPage(req, res, 'dashboard', {
+			title: 'Issues',
+			data: issues
+		})
+	} catch (error) {
 		console.log(error.message);
 		res.redirect('/profile');
 	}
 }
 const updateUserFavorites = async (res, req, err, next) => {
-	const user = await User.findOne({	where: {
-		id: req.user.id
-	}})
+	const user = await User.findOne({
+		where: {
+			id: req.user.id
+		}
+	})
 	// user.addRepo()
 	res.redirect('/')
+}
+
+const renderPage = (req, res, page, options) => {
+	const {
+		user,
+		navItems
+	} = req;
+	options = {
+		...options,
+		user,
+		navItems
+	}
+	res.render(page, options);
 }
 
 export default {

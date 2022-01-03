@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import expressSession from 'express-session';
 import morgan from 'morgan';
-import {User, Repo}  from './models.js';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -16,6 +15,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.use(express.static('public'));
+app.use('/css', express.static('./node_modules/bootstrap/dist/css'));
 
 // Middleware sessions
 app.use(morgan('combined'));
@@ -24,15 +24,37 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(expressSession({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
+const navItems = [
+	{
+		action: 'Dashboard',
+		path: '/'
+	},
+	{
+		action: 'Profile',
+		path: '/profile'
+	},
+	{
+		action: 'My Repos',
+		path: '/repos'
+	}
+];
 // Passport
 app.use(AuthController.initialize);
 app.use(AuthController.session);
+app.use((req, res, next) => {
+	req.navItems = navItems.map(item => {
+		return item.path === req.path
+					? {...item, active: true}
+					: item
+	})
+	next();
+})
 
 app.get('/login/github', AuthController.login );
 app.get('/auth/github/callback', AuthController.authenticate, AuthController.successRedirect );
 
 app.get('/', (req, res) => {
-	const { user } = req;
+	const { user, navItems } = req;
 	if (user) res.redirect('/profile');
 	else res.render('index', {layout: false});
 });
