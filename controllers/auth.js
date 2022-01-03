@@ -22,7 +22,6 @@ const passportCallback = async (accessToken, refreshToken, profile, next) => {
 			}
 			return next(err, createdUser);
 		} else {
-			welcomeEmail(user.username, user.email)
 			user.githubToken = accessToken;
 			await user.save();
 			return next(err, user);
