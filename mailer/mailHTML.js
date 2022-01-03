@@ -138,7 +138,6 @@ const footer = `
 const contentBuilder = data => {
   let message = '';
   Object.entries(data).forEach(([key, value]) => {
-    console.log('DATA', value)
     message += `
     <tr>
       <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
@@ -155,6 +154,5 @@ const contentBuilder = data => {
   return message;
 }
 export const mailMessageGenerator = data => {
-  console.log('DATA', data)
   return header + contentBuilder(data) + footer;
 }

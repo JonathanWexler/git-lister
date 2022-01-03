@@ -4,6 +4,7 @@ import expressSession from 'express-session';
 import morgan from 'morgan';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
+import '#mailer/sendgrid.js'
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -51,6 +52,14 @@ app.use((req, res, next) => {
 	next();
 })
 
+import {welcomeEmail} from '#mailer/sendgrid.js'
+
+
+app.get('/email', (req, res) => {
+	const { user: {username, email} } = req;
+	welcomeEmail(username, email);
+	res.redirect('/profile');
+})
 app.get('/login/github', AuthController.login );
 app.get('/auth/github/callback', AuthController.authenticate, AuthController.successRedirect );
 

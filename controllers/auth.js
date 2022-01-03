@@ -3,26 +3,29 @@ import { Strategy as GitHubStrategy } from 'passport-github'
 import {User} from '#models/index.js';
 import {welcomeEmail} from '#mailer/sendgrid.js'
 
-const passportCallback = async (accessToken, refreshToken, profile, next) => {
+const passportCallback = async (githubToken, refreshToken, profile, next) => {
 	let err = null;
 	try {
-		const {id: githubId} = profile;
-		console.log('ABOUT TO FIND USER', githubId)
+		const {id: githubId, username, _json} = profile;
+		const {email, name, avatar_url: imageURL} = _json
+		const [firstName, lastName] = name.split(' ');
+
 		let user = await User.findOne( { where: { githubId } });
 		if (!user) {
-			console.log('CREATING USER', profile)
-			let createdUser = await User.create({
-				githubId: profile.id,
-				githubToken: accessToken,
-				username: profile.username,
-				email: profile._json.email
+			const createdUser = await User.create({
+				githubId,
+				githubToken,
+				username,
+				email,
+				imageURL
 			});
 			if (createdUser) {
+				console.log('Created new user', createdUser.username, createdUser.email)
 				welcomeEmail(createdUser.username, createdUser.email)
 			}
 			return next(err, createdUser);
 		} else {
-			user.githubToken = accessToken;
+			user.githubToken = githubToken;
 			await user.save();
 			return next(err, user);
 		}

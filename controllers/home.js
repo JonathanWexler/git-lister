@@ -28,12 +28,10 @@ const filterRepoData = (data) => {
 	return repos;
 };
 const filterIssueData = (data) => {
-	console.log(data);
 	return data;
 };
 
 const favoriteRepo = async (req, res, next) => {
-	console.log('FAVORITING', req.params.id, req.user.id)
 	try {
 		const user = await User.findOne({
 			where: {
@@ -70,13 +68,12 @@ const profile = async (req, res) => {
 		// console.log(Object.keys(user.__proto__));
 		renderPage(req, res, 'profile', {user, repos: []})
 	} catch (e) {
-		console.log('HOME', e)
+		console.log('Error', e)
 	}
 }
 
 const renderPage = (req, res, page, options) => {
 	const {user, navItems} = req;
-	console.log('NAV ITEMSS', navItems)
 	options = {user, ...options, navItems}
 	res.render(page, options);
 }

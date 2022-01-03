@@ -5,7 +5,6 @@ import {
 } from '#models/index.js';
 
 const getGithubAccount = user => {
-	console.log('user', user)
 	const {
 		username,
 		githubToken: token
@@ -42,11 +41,8 @@ const updateRepoData = async (repos) => {
 				githubId: repoData.githubId
 			}
 		})
-		console.log(repoData)
 		updatedRepos.push(repo);
 	});
-	console.log('DONE')
-
 
 	return updatedRepos;
 }
